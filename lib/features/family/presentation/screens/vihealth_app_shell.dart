@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_card.dart';
@@ -1107,8 +1109,11 @@ class _DocumentTile extends StatelessWidget {
         ),
       ),
       title: document.title,
-      subtitle:
-          '${member.nickname} - ${document.hospitalName} - ${_formatDate(document.documentDate)}',
+      subtitle: _documentSubtitle(document, member),
+      trailing: Icon(
+        _documentSourceIcon(document.source),
+        color: AppColors.muted,
+      ),
       onTap: onTap,
     );
   }
@@ -1221,6 +1226,10 @@ void _showMemberSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    backgroundColor: AppColors.background,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (context) => _FormSheet(
       title: member == null ? 'Thêm thành viên' : 'Sửa hồ sơ',
       subtitle: 'Lưu thông tin cá nhân và ghi chú y tế quan trọng.',
@@ -1294,6 +1303,10 @@ void _showMetricSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    backgroundColor: AppColors.background,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (context) => StatefulBuilder(
       builder: (context, setState) => _FormSheet(
         title: 'Ghi chỉ số',
@@ -1308,18 +1321,21 @@ void _showMetricSheet(
                 value: memberId,
                 onChanged: (value) => setState(() => memberId = value),
               ),
-              DropdownButtonFormField<MetricType>(
-                initialValue: type,
-                decoration: const InputDecoration(labelText: 'Loại chỉ số'),
-                items: MetricType.values
-                    .map(
-                      (item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(_metricLabel(item)),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => type = value ?? type),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: DropdownButtonFormField<MetricType>(
+                  initialValue: type,
+                  decoration: _fieldDecoration('Loại chỉ số'),
+                  items: MetricType.values
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(_metricLabel(item)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) => setState(() => type = value ?? type),
+                ),
               ),
               _AppTextField(
                 controller: primary,
@@ -1384,6 +1400,10 @@ void _showMedicineSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    backgroundColor: AppColors.background,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (context) => StatefulBuilder(
       builder: (context, setState) => _FormSheet(
         title: medicine == null ? 'Thêm thuốc' : 'Sửa thuốc',
@@ -1467,11 +1487,22 @@ void _showDocumentSheet(
   final title = TextEditingController(text: document?.title ?? '');
   final type = TextEditingController(text: document?.type ?? 'PDF');
   final hospital = TextEditingController(text: document?.hospitalName ?? '');
+  var pickedFile = document?.fileName == null
+      ? null
+      : _PickedDocumentFile(
+          name: document!.fileName!,
+          sizeBytes: document.fileSizeBytes,
+          source: document.source,
+        );
 
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    backgroundColor: AppColors.background,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (context) => StatefulBuilder(
       builder: (context, setState) => _FormSheet(
         title: document == null ? 'Thêm tài liệu' : 'Sửa tài liệu',
@@ -1485,6 +1516,31 @@ void _showDocumentSheet(
                 dashboard: dashboard,
                 value: memberId,
                 onChanged: (value) => setState(() => memberId = value),
+              ),
+              _DocumentSourcePicker(
+                selectedFile: pickedFile,
+                onCameraTap: () async {
+                  final file = await _pickDocumentFromCamera(context);
+                  if (file == null) return;
+                  setState(() {
+                    pickedFile = file;
+                    type.text = 'IMG';
+                    if (title.text.trim().isEmpty) {
+                      title.text = 'Ảnh chụp tài liệu';
+                    }
+                  });
+                },
+                onUploadTap: () async {
+                  final file = await _pickDocumentFile(context);
+                  if (file == null) return;
+                  setState(() {
+                    pickedFile = file;
+                    type.text = _documentTypeFromFileName(file.name);
+                    if (title.text.trim().isEmpty) {
+                      title.text = _titleFromFileName(file.name);
+                    }
+                  });
+                },
               ),
               _AppTextField(
                 controller: title,
@@ -1508,6 +1564,13 @@ void _showDocumentSheet(
                           ? 'Chưa nhập'
                           : hospital.text.trim(),
                       documentDate: DateTime.now(),
+                      source:
+                          pickedFile?.source ??
+                          document?.source ??
+                          DocumentSource.manual,
+                      fileName: pickedFile?.name ?? document?.fileName,
+                      fileSizeBytes:
+                          pickedFile?.sizeBytes ?? document?.fileSizeBytes,
                     ),
                   );
                   if (context.mounted) Navigator.pop(context);
@@ -1544,6 +1607,10 @@ void _showReminderSheet(
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    backgroundColor: AppColors.background,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (context) => StatefulBuilder(
       builder: (context, setState) => _FormSheet(
         title: reminder == null ? 'Thêm lịch nhắc' : 'Sửa lịch nhắc',
@@ -1558,18 +1625,21 @@ void _showReminderSheet(
                 value: memberId,
                 onChanged: (value) => setState(() => memberId = value),
               ),
-              DropdownButtonFormField<ReminderType>(
-                initialValue: type,
-                decoration: const InputDecoration(labelText: 'Loại nhắc'),
-                items: ReminderType.values
-                    .map(
-                      (item) => DropdownMenuItem(
-                        value: item,
-                        child: Text(_reminderLabel(item)),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => type = value ?? type),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: DropdownButtonFormField<ReminderType>(
+                  initialValue: type,
+                  decoration: _fieldDecoration('Loại nhắc'),
+                  items: ReminderType.values
+                      .map(
+                        (item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(_reminderLabel(item)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) => setState(() => type = value ?? type),
+                ),
               ),
               _AppTextField(
                 controller: title,
@@ -1614,6 +1684,140 @@ void _showReminderSheet(
   );
 }
 
+class _PickedDocumentFile {
+  const _PickedDocumentFile({
+    required this.name,
+    required this.source,
+    this.sizeBytes,
+  });
+
+  final String name;
+  final DocumentSource source;
+  final int? sizeBytes;
+}
+
+class _DocumentSourcePicker extends StatelessWidget {
+  const _DocumentSourcePicker({
+    required this.onCameraTap,
+    required this.onUploadTap,
+    this.selectedFile,
+  });
+
+  final _PickedDocumentFile? selectedFile;
+  final VoidCallback onCameraTap;
+  final VoidCallback onUploadTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _DocumentSourceButton(
+                  icon: Icons.photo_camera_rounded,
+                  label: 'Chụp ảnh',
+                  onTap: onCameraTap,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _DocumentSourceButton(
+                  icon: Icons.upload_file_rounded,
+                  label: 'Tải file',
+                  onTap: onUploadTap,
+                ),
+              ),
+            ],
+          ),
+          if (selectedFile != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.primarySoft,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.primary.withAlpha(70)),
+              ),
+              child: Row(
+                children: [
+                  IconCircle(
+                    icon: _documentSourceIcon(selectedFile!.source),
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          selectedFile!.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 2),
+                        SubtleText(
+                          '${_documentSourceLabel(selectedFile!.source)}'
+                          '${selectedFile!.sizeBytes == null ? '' : ' - ${_formatFileSize(selectedFile!.sizeBytes!)}'}',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DocumentSourceButton extends StatelessWidget {
+  const _DocumentSourceButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        height: 72,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.line),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: AppColors.primary, size: 24),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _FormSheet extends StatelessWidget {
   const _FormSheet({
     required this.title,
@@ -1651,6 +1855,41 @@ class _FormSheet extends StatelessWidget {
   }
 }
 
+InputDecoration _fieldDecoration(String label) {
+  const borderRadius = BorderRadius.all(Radius.circular(18));
+  const baseBorder = OutlineInputBorder(
+    borderRadius: borderRadius,
+    borderSide: BorderSide(color: AppColors.line, width: 1),
+  );
+
+  return InputDecoration(
+    labelText: label,
+    filled: true,
+    fillColor: AppColors.surface,
+    isDense: true,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 17),
+    floatingLabelStyle: const TextStyle(
+      color: AppColors.primary,
+      fontWeight: FontWeight.w700,
+    ),
+    labelStyle: const TextStyle(
+      color: AppColors.muted,
+      fontWeight: FontWeight.w500,
+    ),
+    enabledBorder: baseBorder,
+    border: baseBorder,
+    focusedBorder: baseBorder.copyWith(
+      borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
+    ),
+    errorBorder: baseBorder.copyWith(
+      borderSide: const BorderSide(color: AppColors.danger, width: 1.2),
+    ),
+    focusedErrorBorder: baseBorder.copyWith(
+      borderSide: const BorderSide(color: AppColors.danger, width: 1.4),
+    ),
+  );
+}
+
 class _AppTextField extends StatelessWidget {
   const _AppTextField({
     required this.controller,
@@ -1671,10 +1910,7 @@ class _AppTextField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-        ),
+        decoration: _fieldDecoration(label),
         validator: required
             ? (value) => (value == null || value.trim().isEmpty)
                   ? 'Vui lòng nhập $label'
@@ -1702,10 +1938,7 @@ class _MemberDropdown extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<String>(
         initialValue: value,
-        decoration: InputDecoration(
-          labelText: 'Thành viên',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-        ),
+        decoration: _fieldDecoration('Thành viên'),
         items: dashboard.members
             .map(
               (member) => DropdownMenuItem(
@@ -1777,6 +2010,10 @@ void _showSearchSheet(BuildContext context, FamilyDashboard dashboard) {
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
+    backgroundColor: AppColors.background,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
     builder: (context) => StatefulBuilder(
       builder: (context, setState) {
         final normalized = query.toLowerCase().trim();
@@ -1818,12 +2055,7 @@ void _showSearchSheet(BuildContext context, FamilyDashboard dashboard) {
             children: [
               TextField(
                 autofocus: true,
-                decoration: InputDecoration(
-                  labelText: 'Từ khóa',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
+                decoration: _fieldDecoration('Từ khóa'),
                 onChanged: (value) => setState(() => query = value),
               ),
               const SizedBox(height: 12),
@@ -1889,6 +2121,124 @@ String _reminderLabel(ReminderType type) {
     ReminderType.vaccine => 'Tiêm phòng',
     ReminderType.buyMedicine => 'Mua thuốc',
   };
+}
+
+Future<_PickedDocumentFile?> _pickDocumentFromCamera(
+  BuildContext context,
+) async {
+  try {
+    final picker = ImagePicker();
+    if (!picker.supportsImageSource(ImageSource.camera)) {
+      if (context.mounted) {
+        _showPickerError(
+          context,
+          'Thiết bị hoặc trình duyệt hiện tại chưa hỗ trợ chụp ảnh.',
+        );
+      }
+      return null;
+    }
+
+    final image = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 85,
+    );
+    if (image == null) return null;
+
+    return _PickedDocumentFile(
+      name: image.name,
+      source: DocumentSource.camera,
+      sizeBytes: await image.length(),
+    );
+  } catch (_) {
+    if (context.mounted) {
+      _showPickerError(
+        context,
+        'Không thể mở camera. Hãy kiểm tra quyền camera hoặc thử tải ảnh lên.',
+      );
+    }
+    return null;
+  }
+}
+
+Future<_PickedDocumentFile?> _pickDocumentFile(BuildContext context) async {
+  try {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg', 'heic'],
+      withData: false,
+    );
+    final file = result?.files.single;
+    if (file == null) return null;
+
+    return _PickedDocumentFile(
+      name: file.name,
+      source: DocumentSource.upload,
+      sizeBytes: file.size,
+    );
+  } catch (_) {
+    if (context.mounted) {
+      _showPickerError(context, 'Không thể chọn file. Vui lòng thử lại.');
+    }
+    return null;
+  }
+}
+
+void _showPickerError(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+}
+
+String _documentTypeFromFileName(String fileName) {
+  final extension = fileName.split('.').last.toLowerCase();
+  return switch (extension) {
+    'pdf' => 'PDF',
+    'png' || 'jpg' || 'jpeg' || 'heic' => 'IMG',
+    _ => 'FILE',
+  };
+}
+
+String _titleFromFileName(String fileName) {
+  final name = fileName.contains('.')
+      ? fileName.substring(0, fileName.lastIndexOf('.'))
+      : fileName;
+  return name.replaceAll('-', ' ').replaceAll('_', ' ').trim();
+}
+
+String _documentSubtitle(HealthDocument document, FamilyMember member) {
+  final parts = [
+    member.nickname,
+    document.hospitalName,
+    _formatDate(document.documentDate),
+    _documentSourceLabel(document.source),
+    if (document.fileName != null && document.fileName!.isNotEmpty)
+      document.fileName!,
+    if (document.fileSizeBytes != null)
+      _formatFileSize(document.fileSizeBytes!),
+  ];
+  return parts.join(' - ');
+}
+
+String _documentSourceLabel(DocumentSource source) {
+  return switch (source) {
+    DocumentSource.camera => 'Ảnh chụp',
+    DocumentSource.upload => 'File tải lên',
+    DocumentSource.manual => 'Nhập thủ công',
+  };
+}
+
+IconData _documentSourceIcon(DocumentSource source) {
+  return switch (source) {
+    DocumentSource.camera => Icons.photo_camera_rounded,
+    DocumentSource.upload => Icons.upload_file_rounded,
+    DocumentSource.manual => Icons.description_rounded,
+  };
+}
+
+String _formatFileSize(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  final kb = bytes / 1024;
+  if (kb < 1024) return '${kb.toStringAsFixed(kb < 100 ? 1 : 0)} KB';
+  final mb = kb / 1024;
+  return '${mb.toStringAsFixed(mb < 10 ? 1 : 0)} MB';
 }
 
 Color _memberColor(String id) {

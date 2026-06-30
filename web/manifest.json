@@ -1,6 +1,6 @@
 {
-    "name": "vihealth",
-    "short_name": "vihealth",
+    "name": "ViHealth",
+    "short_name": "ViHealth",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

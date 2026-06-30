@@ -125,6 +125,9 @@ class MockFamilyHealthRepository implements FamilyHealthRepository {
       type: 'PDF',
       hospitalName: 'Bệnh viện A',
       documentDate: DateTime(2026, 6, 12),
+      source: DocumentSource.upload,
+      fileName: 'ket-qua-xet-nghiem-mau.pdf',
+      fileSizeBytes: 1420000,
     ),
     HealthDocument(
       id: 'document-2',
@@ -133,6 +136,9 @@ class MockFamilyHealthRepository implements FamilyHealthRepository {
       type: 'IMG',
       hospitalName: 'Phòng khám Tim mạch',
       documentDate: DateTime(2026, 6, 10),
+      source: DocumentSource.camera,
+      fileName: 'don-thuoc-tim-mach.jpg',
+      fileSizeBytes: 860000,
     ),
     HealthDocument(
       id: 'document-3',
@@ -141,6 +147,9 @@ class MockFamilyHealthRepository implements FamilyHealthRepository {
       type: 'PDF',
       hospitalName: 'Phòng khám Nhi B',
       documentDate: DateTime(2026, 6, 5),
+      source: DocumentSource.upload,
+      fileName: 'lich-tiem-chung.pdf',
+      fileSizeBytes: 980000,
     ),
   ];
   final List<Reminder> _reminders = [

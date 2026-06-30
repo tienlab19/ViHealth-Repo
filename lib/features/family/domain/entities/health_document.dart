@@ -1,3 +1,5 @@
+enum DocumentSource { manual, camera, upload }
+
 class HealthDocument {
   const HealthDocument({
     required this.id,
@@ -6,6 +8,9 @@ class HealthDocument {
     required this.type,
     required this.hospitalName,
     required this.documentDate,
+    this.source = DocumentSource.manual,
+    this.fileName,
+    this.fileSizeBytes,
   });
 
   final String id;
@@ -14,4 +19,7 @@ class HealthDocument {
   final String type;
   final String hospitalName;
   final DateTime documentDate;
+  final DocumentSource source;
+  final String? fileName;
+  final int? fileSizeBytes;
 }
