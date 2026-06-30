@@ -1,0 +1,192 @@
+{
+  "appName": "ViHealth - Sổ Sức Khỏe Gia Đình",
+  "goal": "Ứng dụng quản lý hồ sơ sức khỏe cho bản thân và các thành viên trong gia đình.",
+  "navigation": {
+    "type": "bottom_tab",
+    "tabs": [
+      {
+        "id": "home",
+        "label": "Trang chủ",
+        "screen": "HomeScreen",
+        "icon": "home"
+      },
+      {
+        "id": "profiles",
+        "label": "Hồ sơ",
+        "screen": "ProfilesScreen",
+        "icon": "group"
+      },
+      {
+        "id": "calendar",
+        "label": "Lịch",
+        "screen": "HealthCalendarScreen",
+        "icon": "calendar"
+      },
+      {
+        "id": "documents",
+        "label": "Tài liệu",
+        "screen": "DocumentsScreen",
+        "icon": "folder"
+      },
+      {
+        "id": "settings",
+        "label": "Cài đặt",
+        "screen": "SettingsScreen",
+        "icon": "settings"
+      }
+    ]
+  },
+  "screens": [
+    {
+      "name": "OnboardingScreen",
+      "purpose": "Giới thiệu giá trị app và dẫn người dùng tạo hồ sơ đầu tiên.",
+      "sections": [
+        "BrandHeader",
+        "BenefitCards",
+        "PrimaryCTA"
+      ],
+      "actions": [
+        "Bắt đầu",
+        "Tạo hồ sơ"
+      ]
+    },
+    {
+      "name": "HomeScreen",
+      "purpose": "Tổng quan sức khỏe gia đình, nhắc nhở hôm nay và thao tác thêm nhanh.",
+      "sections": [
+        "GreetingHeader",
+        "FamilyMembersHorizontalList",
+        "TodayReminders",
+        "QuickActionsGrid",
+        "RecentMetrics"
+      ],
+      "actions": [
+        "Thêm chỉ số",
+        "Thêm thuốc",
+        "Thêm tài liệu",
+        "Thêm lịch nhắc"
+      ]
+    },
+    {
+      "name": "ProfilesScreen",
+      "purpose": "Danh sách hồ sơ sức khỏe của các thành viên.",
+      "sections": [
+        "SearchBar",
+        "MemberCards",
+        "AddMemberCTA"
+      ],
+      "actions": [
+        "Thêm thành viên",
+        "Xem chi tiết",
+        "Sửa hồ sơ"
+      ]
+    },
+    {
+      "name": "MemberDetailScreen",
+      "purpose": "Trung tâm dữ liệu sức khỏe của một thành viên.",
+      "sections": [
+        "MemberProfileHeader",
+        "ImportantMedicalInfo",
+        "MetricSummaryCards",
+        "ActiveMedicines",
+        "RecentDocuments",
+        "UpcomingReminders"
+      ],
+      "tabs": [
+        "Tổng quan",
+        "Chỉ số",
+        "Thuốc",
+        "Lịch khám",
+        "Tài liệu",
+        "Nhắc nhở"
+      ]
+    },
+    {
+      "name": "HealthMetricScreen",
+      "purpose": "Nhập và xem lịch sử các chỉ số sức khỏe.",
+      "sections": [
+        "MetricTypeSelector",
+        "MetricInputForm",
+        "MetricHistoryList",
+        "MetricChartPreview"
+      ],
+      "entities": [
+        "blood_pressure",
+        "blood_sugar",
+        "weight",
+        "height",
+        "temperature",
+        "heart_rate",
+        "spo2"
+      ]
+    },
+    {
+      "name": "MedicineScreen",
+      "purpose": "Quản lý thuốc, liều lượng, cách dùng và nhắc uống thuốc.",
+      "sections": [
+        "ActiveMedicineList",
+        "MedicineSchedule",
+        "MedicineForm",
+        "MedicationLog"
+      ],
+      "states": [
+        "Đang dùng",
+        "Đã dừng",
+        "Đã uống",
+        "Bỏ qua",
+        "Uống muộn"
+      ]
+    },
+    {
+      "name": "DocumentsScreen",
+      "purpose": "Lưu trữ đơn thuốc, kết quả xét nghiệm, giấy khám bệnh, ảnh chụp và PDF.",
+      "sections": [
+        "DocumentFilter",
+        "DocumentGrid",
+        "UploadActions",
+        "DocumentDetail"
+      ],
+      "actions": [
+        "Chụp ảnh",
+        "Chọn ảnh",
+        "Tải PDF",
+        "Chia sẻ"
+      ]
+    },
+    {
+      "name": "HealthCalendarScreen",
+      "purpose": "Lịch uống thuốc, tái khám, tiêm phòng, đo chỉ số và mua thuốc.",
+      "sections": [
+        "CalendarHeader",
+        "DailyTimeline",
+        "ReminderCards",
+        "AddReminderCTA"
+      ]
+    },
+    {
+      "name": "SettingsScreen",
+      "purpose": "Quản lý bảo mật, sao lưu, khôi phục, xuất dữ liệu và thông báo.",
+      "sections": [
+        "SecuritySettings",
+        "BackupRestore",
+        "ExportData",
+        "NotificationSettings",
+        "LegalAndPrivacy"
+      ]
+    }
+  ],
+  "coreEntities": [
+    "Member",
+    "MedicalInfo",
+    "HealthMetric",
+    "Medicine",
+    "Reminder",
+    "MedicalDocument",
+    "Appointment"
+  ],
+  "nonGoals": [
+    "Không chẩn đoán bệnh",
+    "Không thay thế bác sĩ",
+    "Không tự ý chia sẻ dữ liệu y tế"
+  ]
+}

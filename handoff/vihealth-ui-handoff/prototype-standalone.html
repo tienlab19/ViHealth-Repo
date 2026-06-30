@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ViHealth - UI Review Prototype</title>
+  <style>
+    :root {
+      --bg: #f5f8fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fbfd;
+      --primary: #1aa37a;
+      --primary-dark: #08795b;
+      --primary-soft: #e6f7f1;
+      --secondary: #2f80ed;
+      --warning: #f2994a;
+      --danger: #eb5757;
+      --purple: #9b51e0;
+      --text: #17212b;
+      --muted: #667085;
+      --line: #e6edf2;
+      --shadow: 0 18px 45px rgba(16, 24, 40, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: radial-gradient(circle at top left, #e8fff5 0, transparent 36%), var(--bg);
+      color: var(--text);
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 28px 24px;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--line);
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: 0 12px 26px rgba(26,163,122,.25);
+    }
+    .brand-title { font-weight: 800; font-size: 20px; line-height: 1.1; }
+    .brand-sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    .section-title {
+      color: #98a2b3;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 11px;
+      font-weight: 800;
+      margin: 24px 0 10px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      color: #344054;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      margin: 2px 0;
+    }
+    .nav-btn:hover, .nav-btn.active { background: var(--primary-soft); color: var(--primary-dark); font-weight: 700; }
+    .nav-ico { width: 24px; text-align: center; }
+
+    .main {
+      padding: 34px 34px 60px;
+      overflow: hidden;
+    }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+    h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: -0.04em; }
+    .lead { margin: 0; color: var(--muted); max-width: 820px; line-height: 1.6; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .badge { padding: 8px 11px; background: #fff; border: 1px solid var(--line); border-radius: 999px; color: #475467; font-size: 13px; }
+    .hero-card {
+      min-width: 260px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #12342b, #0d8763);
+      color: white;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .hero-card strong { display: block; font-size: 28px; margin-top: 10px; }
+    .hero-card span { color: rgba(255,255,255,.74); font-size: 13px; }
+
+    .block { margin-top: 32px; }
+    .block-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 16px; }
+    .block h2 { font-size: 22px; margin: 0; letter-spacing: -0.02em; }
+    .hint { color: var(--muted); font-size: 13px; }
+
+    .tokens { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 14px; }
+    .token-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px; box-shadow: 0 12px 30px rgba(16,24,40,.05); }
+    .swatch { height: 58px; border-radius: 14px; margin-bottom: 12px; }
+    .token-card b { display:block; font-size: 13px; }
+    .token-card small { color: var(--muted); }
+
+    .screen-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 26px;
+      align-items: start;
+    }
+
+    .screen-card { display: none; }
+    .screen-card.show { display: block; }
+    .screen-label { font-weight: 800; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+    .screen-note { color: var(--muted); font-size: 13px; line-height: 1.45; margin: -4px 0 12px; }
+
+    .phone {
+      width: 300px;
+      height: 640px;
+      margin: 0 auto;
+      background: #0f1720;
+      border-radius: 38px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 8px; left: 50%; transform: translateX(-50%);
+      width: 88px; height: 22px;
+      background: #0f1720;
+      border-radius: 0 0 14px 14px;
+      z-index: 3;
+    }
+    .screen {
+      height: 100%;
+      border-radius: 30px;
+      background: #f7fafc;
+      overflow: hidden;
+      position: relative;
+    }
+    .status {
+      height: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 22px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #101828;
+    }
+    .content { padding: 10px 18px 82px; height: calc(100% - 36px); overflow: hidden; }
+    .content.scroll { overflow-y: auto; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .hello h3, .page-title h3 { margin: 0; font-size: 21px; letter-spacing: -0.03em; }
+    .hello p, .page-title p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary-dark); font-weight: 800; }
+    .icon-btn { width: 38px; height: 38px; border-radius: 14px; border: 1px solid var(--line); background: #fff; display: grid; place-items: center; }
+
+    .bottom-nav {
+      position: absolute;
+      bottom: 10px; left: 12px; right: 12px;
+      height: 62px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      box-shadow: 0 12px 26px rgba(16,24,40,.12);
+    }
+    .tab { text-align: center; color: #98a2b3; font-size: 10px; }
+    .tab b { display:block; font-size: 18px; margin-bottom: 2px; }
+    .tab.active { color: var(--primary); font-weight: 800; }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 22px rgba(16,24,40,.04);
+    }
+    .green-card {
+      background: linear-gradient(135deg, #18a879, #1d79d8);
+      color: #fff;
+      border: none;
+      padding: 18px;
+    }
+    .green-card p { color: rgba(255,255,255,.82); margin: 4px 0 0; font-size: 12px; }
+    .row { display:flex; align-items:center; justify-content:space-between; gap: 10px; }
+    .left { display:flex; align-items:center; gap: 10px; min-width: 0; }
+    .circle { width: 42px; height: 42px; border-radius: 16px; display:grid; place-items:center; background: var(--primary-soft); color: var(--primary-dark); font-weight: 800; flex: none; }
+    .circle.blue { background:#e8f2ff; color:#2f80ed; }
+    .circle.orange { background:#fff3e8; color:#f2994a; }
+    .circle.red { background:#ffecec; color:#eb5757; }
+    .circle.purple { background:#f5eaff; color:#9b51e0; }
+    .title { font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .pill { padding: 5px 8px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark); font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .pill.orange { background:#fff3e8; color:#b96919; }
+    .pill.blue { background:#e8f2ff; color:#1c67b9; }
+    .pill.red { background:#ffecec; color:#b42318; }
+
+    .quick-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin: 12px 0; }
+    .quick { background:#fff; border:1px solid var(--line); border-radius:17px; padding: 10px 6px; text-align:center; font-size: 10px; font-weight: 700; color:#344054; }
+    .quick b { display:block; font-size: 20px; margin-bottom: 4px; }
+
+    .metric-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .metric { background:#fff; border:1px solid var(--line); border-radius:18px; padding: 12px; min-height: 86px; }
+    .metric .value { font-size: 20px; font-weight: 900; margin-top: 8px; }
+    .metric small { color: var(--muted); }
+
+    .section-mini { font-size: 13px; font-weight: 900; margin: 18px 0 10px; }
+    .fake-chart { height: 105px; border-radius: 18px; background: linear-gradient(180deg, #f9fbfd, #fff); border: 1px solid var(--line); position: relative; overflow: hidden; }
+    .fake-chart svg { width: 100%; height: 100%; }
+
+    .primary-btn { border:0; border-radius:18px; background: var(--primary); color:white; font-weight: 900; width:100%; padding: 14px; box-shadow: 0 12px 22px rgba(26,163,122,.24); }
+    .input { background:#fff; border:1px solid var(--line); border-radius:16px; padding: 12px; margin-bottom: 10px; }
+    .input label { display:block; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .input strong { font-size: 14px; }
+    .segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background:#ecf2f6; padding: 5px; border-radius: 16px; margin-bottom: 14px; }
+    .segmented span { text-align:center; padding: 8px; border-radius: 12px; font-size: 12px; color: var(--muted); font-weight: 800; }
+    .segmented span.active { background:#fff; color: var(--primary-dark); }
+
+    .doc-thumb { width: 48px; height: 58px; border-radius: 12px; background: linear-gradient(180deg, #e8f2ff, #fff); border: 1px solid #cfe4ff; display:grid; place-items:center; color:#2f80ed; font-weight:900; }
+    .timeline { position: relative; padding-left: 22px; }
+    .timeline::before { content:""; position:absolute; left:7px; top: 4px; bottom: 8px; width:2px; background: var(--line); }
+    .timeline-item { position:relative; margin-bottom: 12px; }
+    .timeline-item::before { content:""; position:absolute; left:-20px; top:4px; width: 12px; height: 12px; background: var(--primary); border-radius:50%; box-shadow:0 0 0 4px #e6f7f1; }
+    .calendar-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .day { height: 31px; border-radius: 10px; display:grid; place-items:center; font-size: 12px; background:#fff; border:1px solid var(--line); color:#475467; }
+    .day.active { background:var(--primary); color:white; font-weight:900; }
+    .day.has { border-color:var(--primary); color:var(--primary-dark); font-weight:800; }
+
+    .onboarding-visual {
+      height: 255px;
+      background: linear-gradient(135deg, #dff8ef, #e8f2ff);
+      border-radius: 26px;
+      margin: 22px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .floating-card { position:absolute; background:#fff; border-radius:18px; padding:12px; box-shadow:0 14px 30px rgba(16,24,40,.12); }
+    .fc1 { left:22px; top:42px; width:150px; }
+    .fc2 { right:20px; top:118px; width:130px; }
+    .fc3 { left:55px; bottom:24px; width:180px; }
+    .big-icon { position:absolute; right:28px; top:28px; width:86px; height:86px; border-radius:28px; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:grid; place-items:center; color:white; font-size:42px; }
+
+    .spec-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 16px; }
+    .spec { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
+    .spec h3 { margin: 0 0 10px; font-size: 16px; }
+    .spec ul { margin: 0; padding-left: 18px; color: var(--muted); line-height: 1.7; font-size: 14px; }
+
+    @media (max-width: 980px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+      .main { padding: 24px 16px 40px; }
+      .hero { flex-direction: column; }
+      .tokens { grid-template-columns: repeat(2, 1fr); }
+      .screen-grid { grid-template-columns: 1fr; }
+      .phone { width: 292px; }
+    }
+
+    @media print {
+      .sidebar { display:none; }
+      .app-shell { display:block; }
+      .screen-card { display:block !important; break-inside: avoid; margin-bottom: 32px; }
+      .phone { box-shadow:none; }
+      body { background:white; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">VH</div>
+        <div>
+          <div class="brand-title">ViHealth</div>
+          <div class="brand-sub">Sổ Sức Khỏe Gia Đình</div>
+        </div>
+      </div>
+
+      <div class="section-title">Review nhanh</div>
+      <button class="nav-btn active" data-filter="all"><span class="nav-ico">▦</span> Tất cả màn hình</button>
+      <button class="nav-btn" data-filter="onboarding"><span class="nav-ico">✨</span> Onboarding</button>
+      <button class="nav-btn" data-filter="home"><span class="nav-ico">🏠</span> Trang chủ</button>
+      <button class="nav-btn" data-filter="members"><span class="nav-ico">👨‍👩‍👧</span> Hồ sơ gia đình</button>
+      <button class="nav-btn" data-filter="detail"><span class="nav-ico">🩺</span> Chi tiết thành viên</button>
+      <button class="nav-btn" data-filter="metrics"><span class="nav-ico">📈</span> Chỉ số sức khỏe</button>
+      <button class="nav-btn" data-filter="medicine"><span class="nav-ico">💊</span> Thuốc & nhắc uống</button>
+      <button class="nav-btn" data-filter="documents"><span class="nav-ico">📄</span> Tài liệu y tế</button>
+      <button class="nav-btn" data-filter="calendar"><span class="nav-ico">📅</span> Lịch sức khỏe</button>
+      <button class="nav-btn" data-filter="settings"><span class="nav-ico">🔒</span> Cài đặt & bảo mật</button>
+
+      <div class="section-title">Định hướng thiết kế</div>
+      <div class="hint">Phong cách: sạch, tin cậy, thân thiện với gia đình, ưu tiên người lớn tuổi dễ thao tác.</div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <h1>Bộ giao diện người dùng ViHealth</h1>
+          <p class="lead">Prototype HTML phục vụ review luồng UI cho ứng dụng Sổ Sức Khỏe Gia Đình: quản lý hồ sơ thành viên, chỉ số sức khỏe, thuốc, lịch nhắc, tài liệu y tế, bảo mật và xuất dữ liệu.</p>
+          <div class="badge-row">
+            <span class="badge">Mobile-first</span>
+            <span class="badge">Family health records</span>
+            <span class="badge">Private by design</span>
+            <span class="badge">Local notification</span>
+            <span class="badge">PDF / Image / Backup</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <span>Tổng số màn hình review</span>
+          <strong>10 screens</strong>
+          <span>Thiết kế theo hướng MVP mở rộng được</span>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="block-head">
+          <h2>Design system đề xuất</h2>
+          <span class="hint">Màu chủ đạo xanh y tế, xanh dương phụ trợ, nhiều khoảng trắng, card bo góc lớn.</span>
+        </div>
+        <div class="tokens">
+          <div class="token-card"><div class="swatch" style="background:#1aa37a"></div><b>Primary</b><small>#1AA37A</small></div>
+          <div class="token-card"><div class="swatch" style="background:#2f80ed"></div><b>Secondary</b><small>#2F80ED</small></div>
+          <div class="token-card"><div class="swatch" style="background:#f2994a"></div><b>Warning</b><small>#F2994A</small></div>
+          <div class="token-card"><div class="swatch" style="background:#eb5757"></div><b>Danger</b><small>#EB5757</small></div>
+          <div class="token-card"><div class="swatch" style="background:#f5f8fb"></div><b>Background</b><small>#F5F8FB</small></div>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="block-head">
+          <h2>Màn hình chính</h2>
+          <span class="hint">Bấm menu bên trái để lọc từng màn hình.</span>
+        </div>
+        <div class="screen-grid">
+
+          <article class="screen-card show" data-screen="onboarding">
+            <p class="screen-label">✨ Onboarding</p>
+            <p class="screen-note">Giới thiệu giá trị chính: quản lý sức khỏe cả gia đình, lưu riêng tư, dễ xem lại khi đi khám.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content">
+              <div class="onboarding-visual">
+                <div class="big-icon">♡</div>
+                <div class="floating-card fc1"><div class="title">Bố</div><div class="sub">Huyết áp hôm nay</div><div class="pill">125/80</div></div>
+                <div class="floating-card fc2"><div class="title">Mẹ</div><div class="sub">Uống thuốc</div><div class="pill orange">07:30</div></div>
+                <div class="floating-card fc3"><div class="title">Bé Minh</div><div class="sub">Lịch tiêm phòng</div><div class="pill blue">Thứ 6</div></div>
+              </div>
+              <div class="page-title"><h3>Sổ sức khỏe cho cả gia đình</h3><p>Lưu hồ sơ, chỉ số, thuốc và tài liệu y tế của từng người thân ở một nơi riêng tư.</p></div>
+              <div style="display:flex; gap:6px; margin:24px 0 18px"><span style="height:7px;width:24px;background:var(--primary);border-radius:99px"></span><span style="height:7px;width:7px;background:#d0d5dd;border-radius:50%"></span><span style="height:7px;width:7px;background:#d0d5dd;border-radius:50%"></span></div>
+              <button class="primary-btn">Bắt đầu tạo hồ sơ</button>
+            </div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="home">
+            <p class="screen-label">🏠 Trang chủ</p>
+            <p class="screen-note">Dashboard tổng quan: nhắc nhở hôm nay, thành viên, hành động thêm nhanh.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><div class="hello"><h3>Chào Tien 👋</h3><p>Hôm nay có 4 việc sức khỏe</p></div><div class="avatar">T</div></div>
+              <div class="card green-card"><div class="row"><div><div class="title">Gia đình của bạn</div><p>4 hồ sơ · 3 lịch nhắc · 12 tài liệu</p></div><div style="font-size:34px">🩺</div></div></div>
+              <div class="section-mini">Thêm nhanh</div>
+              <div class="quick-grid"><div class="quick"><b>➕</b>Chỉ số</div><div class="quick"><b>💊</b>Thuốc</div><div class="quick"><b>📄</b>Tài liệu</div><div class="quick"><b>📅</b>Lịch</div></div>
+              <div class="section-mini">Nhắc nhở hôm nay</div>
+              <div class="card row"><div class="left"><div class="circle orange">💊</div><div><div class="title">Bố uống thuốc huyết áp</div><div class="sub">07:30 · Amlodipine 5mg</div></div></div><span class="pill orange">Sắp tới</span></div>
+              <div class="card row"><div class="left"><div class="circle blue">🩸</div><div><div class="title">Mẹ đo đường huyết</div><div class="sub">Trước ăn sáng</div></div></div><span class="pill blue">08:00</span></div>
+              <div class="section-mini">Thành viên</div>
+              <div class="card row"><div class="left"><div class="circle">B</div><div><div class="title">Nguyễn Văn Bình</div><div class="sub">Bố · 65 tuổi</div></div></div><span>›</span></div>
+              <div class="card row"><div class="left"><div class="circle purple">M</div><div><div class="title">Trần Thị Mai</div><div class="sub">Mẹ · 61 tuổi</div></div></div><span>›</span></div>
+            </div><div class="bottom-nav"><div class="tab active"><b>⌂</b>Home</div><div class="tab"><b>♡</b>Hồ sơ</div><div class="tab"><b>＋</b>Thêm</div><div class="tab"><b>▦</b>Tài liệu</div><div class="tab"><b>⚙</b>Cài đặt</div></div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="members">
+            <p class="screen-label">👨‍👩‍👧 Hồ sơ gia đình</p>
+            <p class="screen-note">Danh sách thành viên, mỗi người có hồ sơ riêng và ghi chú sức khỏe quan trọng.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><div class="page-title"><h3>Hồ sơ gia đình</h3><p>4 thành viên đang theo dõi</p></div><button class="icon-btn">＋</button></div>
+              <div class="card row"><div class="left"><div class="circle">T</div><div><div class="title">Tôi</div><div class="sub">Cá nhân · Nhóm máu O</div></div></div><span class="pill">Khỏe</span></div>
+              <div class="card row"><div class="left"><div class="circle blue">B</div><div><div class="title">Nguyễn Văn Bình</div><div class="sub">Bố · Tăng huyết áp</div></div></div><span class="pill orange">Cần theo dõi</span></div>
+              <div class="card row"><div class="left"><div class="circle purple">M</div><div><div class="title">Trần Thị Mai</div><div class="sub">Mẹ · Tiểu đường type 2</div></div></div><span class="pill orange">Cần theo dõi</span></div>
+              <div class="card row"><div class="left"><div class="circle red">N</div><div><div class="title">Bé Ngọc</div><div class="sub">Con gái · 5 tuổi</div></div></div><span class="pill blue">Tiêm chủng</span></div>
+              <button class="primary-btn">Thêm thành viên mới</button>
+            </div><div class="bottom-nav"><div class="tab"><b>⌂</b>Home</div><div class="tab active"><b>♡</b>Hồ sơ</div><div class="tab"><b>＋</b>Thêm</div><div class="tab"><b>▦</b>Tài liệu</div><div class="tab"><b>⚙</b>Cài đặt</div></div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="detail">
+            <p class="screen-label">🩺 Chi tiết thành viên</p>
+            <p class="screen-note">Màn hình trung tâm của từng người: tổng quan, chỉ số gần nhất, thuốc, lịch khám, tài liệu.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><button class="icon-btn">‹</button><button class="icon-btn">⋯</button></div>
+              <div class="card green-card"><div class="row"><div class="left"><div class="circle" style="background:rgba(255,255,255,.2);color:white">B</div><div><div class="title">Nguyễn Văn Bình</div><p>Bố · 65 tuổi · Nhóm máu B</p></div></div></div></div>
+              <div class="segmented"><span class="active">Tổng quan</span><span>Chỉ số</span><span>Thuốc</span></div>
+              <div class="metric-grid"><div class="metric"><small>Huyết áp</small><div class="value">125/80</div><small>mmHg</small></div><div class="metric"><small>Nhịp tim</small><div class="value">75</div><small>bpm</small></div><div class="metric"><small>Cân nặng</small><div class="value">68.5</div><small>kg</small></div><div class="metric"><small>SpO2</small><div class="value">98%</div><small>Hôm nay</small></div></div>
+              <div class="section-mini">Thông tin y tế quan trọng</div>
+              <div class="card"><div class="row"><div><div class="title">Bệnh nền</div><div class="sub">Tăng huyết áp, mỡ máu</div></div><span>›</span></div></div>
+              <div class="card"><div class="row"><div><div class="title">Dị ứng</div><div class="sub">Chưa ghi nhận</div></div><span>›</span></div></div>
+              <div class="section-mini">Tài liệu gần đây</div>
+              <div class="card row"><div class="left"><div class="doc-thumb">PDF</div><div><div class="title">Kết quả xét nghiệm máu</div><div class="sub">Bệnh viện A · 12/06/2026</div></div></div></div>
+            </div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="metrics">
+            <p class="screen-label">📈 Chỉ số sức khỏe</p>
+            <p class="screen-note">Theo dõi lịch sử và xu hướng chỉ số, tránh diễn giải chẩn đoán y khoa.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><div class="page-title"><h3>Huyết áp</h3><p>Nguyễn Văn Bình · 30 ngày gần nhất</p></div><button class="icon-btn">＋</button></div>
+              <div class="fake-chart"><svg viewBox="0 0 260 105" preserveAspectRatio="none"><path d="M0 78 C35 60, 52 70, 78 48 S132 44, 158 55 S210 74, 260 36" fill="none" stroke="#1aa37a" stroke-width="4"/><path d="M0 88 C45 74, 60 82, 90 68 S148 58, 178 72 S226 88, 260 62" fill="none" stroke="#2f80ed" stroke-width="4" opacity=".85"/></svg></div>
+              <div class="metric-grid" style="margin-top:12px"><div class="metric"><small>Gần nhất</small><div class="value">125/80</div><small>Hôm nay 07:10</small></div><div class="metric"><small>Trung bình</small><div class="value">128/82</div><small>7 ngày</small></div></div>
+              <div class="section-mini">Lịch sử ghi nhận</div>
+              <div class="card row"><div><div class="title">125/80 mmHg</div><div class="sub">Hôm nay · Sau khi ngủ dậy</div></div><span class="pill">Ổn định</span></div>
+              <div class="card row"><div><div class="title">132/84 mmHg</div><div class="sub">Hôm qua · Buổi sáng</div></div><span class="pill orange">Cao hơn</span></div>
+              <div class="card row"><div><div class="title">126/81 mmHg</div><div class="sub">27/06/2026 · Buổi tối</div></div><span class="pill">Ổn định</span></div>
+              <button class="primary-btn">Ghi chỉ số mới</button>
+            </div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="medicine">
+            <p class="screen-label">💊 Thuốc & nhắc uống</p>
+            <p class="screen-note">Quản lý thuốc, liều lượng, cách dùng, thời gian và trạng thái uống thuốc.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><div class="page-title"><h3>Thuốc hôm nay</h3><p>3 lịch cần theo dõi</p></div><button class="icon-btn">＋</button></div>
+              <div class="segmented"><span class="active">Hôm nay</span><span>Đang dùng</span><span>Đã dừng</span></div>
+              <div class="card row"><div class="left"><div class="circle orange">💊</div><div><div class="title">Amlodipine 5mg</div><div class="sub">Bố · 1 viên sau ăn sáng</div></div></div><span class="pill orange">07:30</span></div>
+              <div class="card row"><div class="left"><div class="circle blue">💊</div><div><div class="title">Metformin 500mg</div><div class="sub">Mẹ · 1 viên sau ăn tối</div></div></div><span class="pill blue">19:00</span></div>
+              <div class="section-mini">Chi tiết thuốc</div>
+              <div class="input"><label>Tên thuốc</label><strong>Amlodipine 5mg</strong></div>
+              <div class="input"><label>Liều lượng</label><strong>1 viên / lần · 1 lần / ngày</strong></div>
+              <div class="input"><label>Thời gian dùng</label><strong>01/06/2026 - 30/06/2026</strong></div>
+              <button class="primary-btn">Đánh dấu đã uống</button>
+            </div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="documents">
+            <p class="screen-label">📄 Tài liệu y tế</p>
+            <p class="screen-note">Lưu đơn thuốc, kết quả xét nghiệm, giấy khám bệnh, ảnh chụp phim, PDF.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><div class="page-title"><h3>Tài liệu y tế</h3><p>12 tài liệu · 4 thành viên</p></div><button class="icon-btn">＋</button></div>
+              <div class="segmented"><span class="active">Tất cả</span><span>PDF</span><span>Ảnh</span></div>
+              <div class="card row"><div class="left"><div class="doc-thumb">PDF</div><div><div class="title">Kết quả xét nghiệm máu</div><div class="sub">Bố · 12/06/2026 · BV A</div></div></div><span>›</span></div>
+              <div class="card row"><div class="left"><div class="doc-thumb">IMG</div><div><div class="title">Đơn thuốc khám tim mạch</div><div class="sub">Bố · 10/06/2026</div></div></div><span>›</span></div>
+              <div class="card row"><div class="left"><div class="doc-thumb">PDF</div><div><div class="title">Lịch tiêm chủng</div><div class="sub">Bé Ngọc · 05/06/2026</div></div></div><span>›</span></div>
+              <div class="section-mini">Thêm tài liệu</div>
+              <div class="quick-grid"><div class="quick"><b>📷</b>Chụp</div><div class="quick"><b>🖼</b>Ảnh</div><div class="quick"><b>📎</b>PDF</div><div class="quick"><b>🏷</b>Phân loại</div></div>
+            </div><div class="bottom-nav"><div class="tab"><b>⌂</b>Home</div><div class="tab"><b>♡</b>Hồ sơ</div><div class="tab"><b>＋</b>Thêm</div><div class="tab active"><b>▦</b>Tài liệu</div><div class="tab"><b>⚙</b>Cài đặt</div></div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="calendar">
+            <p class="screen-label">📅 Lịch sức khỏe</p>
+            <p class="screen-note">Tập trung lịch uống thuốc, tái khám, tiêm phòng, đo chỉ số và mua thuốc.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><div class="page-title"><h3>Lịch sức khỏe</h3><p>Tháng 6, 2026</p></div><button class="icon-btn">＋</button></div>
+              <div class="calendar-grid">
+                <div class="day">T2</div><div class="day">T3</div><div class="day">T4</div><div class="day">T5</div><div class="day">T6</div><div class="day">T7</div><div class="day">CN</div>
+                <div class="day">22</div><div class="day has">23</div><div class="day">24</div><div class="day active">25</div><div class="day has">26</div><div class="day">27</div><div class="day">28</div>
+                <div class="day has">29</div><div class="day">30</div><div class="day">1</div><div class="day">2</div><div class="day has">3</div><div class="day">4</div><div class="day">5</div>
+              </div>
+              <div class="section-mini">Việc ngày 25/06</div>
+              <div class="timeline">
+                <div class="timeline-item"><div class="card"><div class="title">07:30 · Uống thuốc huyết áp</div><div class="sub">Nguyễn Văn Bình · Amlodipine 5mg</div></div></div>
+                <div class="timeline-item"><div class="card"><div class="title">08:00 · Đo đường huyết</div><div class="sub">Trần Thị Mai · Trước ăn sáng</div></div></div>
+                <div class="timeline-item"><div class="card"><div class="title">15:00 · Tái khám nhi</div><div class="sub">Bé Ngọc · Phòng khám B</div></div></div>
+              </div>
+            </div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="settings">
+            <p class="screen-label">🔒 Cài đặt & bảo mật</p>
+            <p class="screen-note">Nhấn mạnh quyền riêng tư: khóa app, sao lưu, xuất dữ liệu và xóa dữ liệu.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><div class="page-title"><h3>Cài đặt</h3><p>Quyền riêng tư và dữ liệu</p></div><div class="avatar">T</div></div>
+              <div class="card row"><div class="left"><div class="circle">🔐</div><div><div class="title">Khóa ứng dụng</div><div class="sub">PIN, Face ID, Touch ID</div></div></div><span class="pill">Bật</span></div>
+              <div class="card row"><div class="left"><div class="circle blue">☁️</div><div><div class="title">Sao lưu dữ liệu</div><div class="sub">Lần cuối: hôm nay 09:10</div></div></div><span>›</span></div>
+              <div class="card row"><div class="left"><div class="circle purple">📤</div><div><div class="title">Xuất hồ sơ PDF</div><div class="sub">Lưu hoặc chia sẻ khi đi khám</div></div></div><span>›</span></div>
+              <div class="card row"><div class="left"><div class="circle orange">🔔</div><div><div class="title">Thông báo</div><div class="sub">Thuốc, tái khám, đo chỉ số</div></div></div><span>›</span></div>
+              <div class="card row"><div class="left"><div class="circle red">🗑</div><div><div class="title">Xóa dữ liệu</div><div class="sub">Xóa hồ sơ hoặc toàn bộ dữ liệu</div></div></div><span>›</span></div>
+              <div class="card"><div class="title">Lưu ý y tế</div><div class="sub">Ứng dụng chỉ dùng để ghi chép và theo dõi thông tin sức khỏe cá nhân, không thay thế chẩn đoán hoặc tư vấn y tế.</div></div>
+            </div><div class="bottom-nav"><div class="tab"><b>⌂</b>Home</div><div class="tab"><b>♡</b>Hồ sơ</div><div class="tab"><b>＋</b>Thêm</div><div class="tab"><b>▦</b>Tài liệu</div><div class="tab active"><b>⚙</b>Cài đặt</div></div></div></div>
+          </article>
+
+          <article class="screen-card show" data-screen="metrics">
+            <p class="screen-label">➕ Form ghi chỉ số</p>
+            <p class="screen-note">Form nhập liệu rõ đơn vị đo, ít trường bắt buộc, có thời gian và ghi chú.</p>
+            <div class="phone"><div class="screen"><div class="status"><span>9:41</span><span>●●●</span></div><div class="content scroll">
+              <div class="topbar"><button class="icon-btn">‹</button><div class="page-title"><h3>Ghi chỉ số</h3><p>Huyết áp</p></div><button class="icon-btn">✓</button></div>
+              <div class="input"><label>Thành viên</label><strong>Nguyễn Văn Bình</strong></div>
+              <div class="input"><label>Huyết áp tâm thu</label><strong>125 mmHg</strong></div>
+              <div class="input"><label>Huyết áp tâm trương</label><strong>80 mmHg</strong></div>
+              <div class="input"><label>Nhịp tim</label><strong>75 bpm</strong></div>
+              <div class="input"><label>Thời gian đo</label><strong>Hôm nay, 07:10</strong></div>
+              <div class="input"><label>Ghi chú</label><strong>Đo sau khi ngủ dậy</strong></div>
+              <button class="primary-btn">Lưu chỉ số</button>
+            </div></div></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="block-head"><h2>Gợi ý cấu trúc thông tin</h2></div>
+        <div class="spec-grid">
+          <div class="spec"><h3>Bottom navigation</h3><ul><li>Trang chủ</li><li>Hồ sơ</li><li>Thêm nhanh</li><li>Tài liệu</li><li>Cài đặt</li></ul></div>
+          <div class="spec"><h3>Ưu tiên MVP</h3><ul><li>Hồ sơ thành viên</li><li>Chỉ số sức khỏe</li><li>Thuốc và nhắc uống</li><li>Tài liệu y tế</li><li>Khóa ứng dụng</li></ul></div>
+          <div class="spec"><h3>Luồng chính</h3><ul><li>Tạo hồ sơ</li><li>Ghi chỉ số</li><li>Thêm thuốc</li><li>Lưu tài liệu</li><li>Xuất hồ sơ PDF</li></ul></div>
+          <div class="spec"><h3>Nguyên tắc UX</h3><ul><li>Form ngắn, rõ đơn vị</li><li>CTA thêm nhanh luôn dễ thấy</li><li>Không dùng ngôn ngữ chẩn đoán</li><li>Nội dung riêng tư, an toàn</li></ul></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.nav-btn');
+    const cards = document.querySelectorAll('.screen-card');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        cards.forEach(card => {
+          if (filter === 'all' || card.dataset.screen === filter) card.classList.add('show');
+          else card.classList.remove('show');
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>

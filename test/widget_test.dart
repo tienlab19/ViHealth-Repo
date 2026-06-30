@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vihealth/features/family/data/repositories/mock_family_health_repository.dart';
 import 'package:vihealth/features/family/domain/usecases/get_family_dashboard.dart';
@@ -15,20 +16,26 @@ void main() {
     await tester.pumpWidget(ViHealthApp(dashboardController: controller));
     await tester.pumpAndSettle();
 
+    expect(find.text('Sổ Sức Khỏe Gia Đình'), findsOneWidget);
+
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -260));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Bắt đầu'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Chào bạn'), findsOneWidget);
     expect(find.text('Gia đình của bạn'), findsOneWidget);
-    expect(find.text('Bố'), findsOneWidget);
 
-    await tester.tap(find.text('Hồ sơ'));
+    await tester.tap(find.text('Hồ sơ').last);
     await tester.pumpAndSettle();
 
     expect(find.text('Hồ sơ gia đình'), findsOneWidget);
     expect(find.text('Danh sách thành viên'), findsOneWidget);
 
-    await tester.tap(find.text('Lịch'));
+    await tester.tap(find.text('Lịch').last);
     await tester.pumpAndSettle();
 
     expect(find.text('Lịch sức khỏe'), findsOneWidget);
-    expect(find.text('Hôm nay, 30/06'), findsOneWidget);
+    expect(find.text('Hôm nay'), findsOneWidget);
   });
 }

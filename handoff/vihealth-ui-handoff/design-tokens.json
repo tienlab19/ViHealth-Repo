@@ -1,0 +1,42 @@
+{
+  "appName": "ViHealth - Sổ Sức Khỏe Gia Đình",
+  "platform": "mobile",
+  "language": "vi",
+  "colors": {
+    "primary": "#1AA37A",
+    "primaryDark": "#08795B",
+    "primarySoft": "#E6F7F1",
+    "secondary": "#2F80ED",
+    "warning": "#F2994A",
+    "danger": "#EB5757",
+    "purple": "#9B51E0",
+    "background": "#F5F8FB",
+    "surface": "#FFFFFF",
+    "surfaceSoft": "#F8FBFD",
+    "textPrimary": "#17212B",
+    "textSecondary": "#667085",
+    "line": "#E6EDF2"
+  },
+  "typography": {
+    "fontFamily": "Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+    "baseSize": 14,
+    "titleSize": 21,
+    "sectionTitleSize": 16
+  },
+  "radius": {
+    "md": 14,
+    "lg": 20,
+    "xl": 28
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32
+  },
+  "shadow": {
+    "card": "0 10px 22px rgba(16,24,40,.04)",
+    "elevated": "0 18px 45px rgba(16,24,40,.12)"
+  }
+}
