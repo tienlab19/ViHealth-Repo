@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
+import 'core/services/local_notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/family/data/repositories/mock_family_health_repository.dart';
 import 'features/family/domain/usecases/get_family_dashboard.dart';
 import 'features/family/presentation/controllers/family_dashboard_controller.dart';
 import 'features/family/presentation/screens/vihealth_app_shell.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final notificationService = LocalNotificationService();
+  await notificationService.initialize();
+
   final repository = MockFamilyHealthRepository();
   final dashboardController = FamilyDashboardController(
     getFamilyDashboard: GetFamilyDashboard(repository),
     repository: repository,
+    notificationService: notificationService,
   )..load();
 
   runApp(ViHealthApp(dashboardController: dashboardController));

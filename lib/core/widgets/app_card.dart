@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
@@ -16,25 +18,35 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: padding,
-      decoration: BoxDecoration(
-        color: gradient == null ? AppColors.surface : null,
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: gradient == null ? AppColors.line : Colors.transparent,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            color: gradient == null
+                ? AppColors.surface.withValues(alpha: 0.74)
+                : null,
+            gradient: gradient,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: gradient == null
+                  ? Colors.white.withValues(alpha: 0.78)
+                  : Colors.white.withValues(alpha: 0.18),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 28,
+                offset: const Offset(0, 12),
+              ),
+            ],
           ),
-        ],
+          child: child,
+        ),
       ),
-      child: child,
     );
   }
 }

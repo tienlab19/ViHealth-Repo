@@ -1,9 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/family_dashboard.dart';
 import '../controllers/family_dashboard_controller.dart';
-import 'documents_screen.dart';
 import 'health_calendar_screen.dart';
 import 'home_screen.dart';
 import 'onboarding_screen.dart';
@@ -61,67 +62,154 @@ class _ShellScaffold extends StatelessWidget {
       HomeScreen(dashboard: dashboard, controller: controller),
       ProfilesScreen(dashboard: dashboard, controller: controller),
       HealthCalendarScreen(dashboard: dashboard, controller: controller),
-      DocumentsScreen(dashboard: dashboard, controller: controller),
       SettingsScreen(dashboard: dashboard, controller: controller),
     ];
 
     return Scaffold(
-      body: SafeArea(
-        child: IndexedStack(
-          index: controller.selectedIndex.clamp(0, screens.length - 1),
-          children: screens,
+      extendBody: true,
+      backgroundColor: AppColors.background,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF8FBFD), Color(0xFFEAF6F2), Color(0xFFF5F8FB)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: IndexedStack(
+            index: controller.selectedIndex.clamp(0, screens.length - 1),
+            children: screens,
+          ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-        child: Container(
-          height: 66,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.96),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.line),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
-                blurRadius: 26,
-                offset: const Offset(0, 12),
-              ),
-            ],
+      bottomNavigationBar: _LiquidGlassTabBar(
+        selectedIndex: controller.selectedIndex.clamp(0, screens.length - 1),
+        onSelected: controller.selectTab,
+      ),
+    );
+  }
+}
+
+class _LiquidGlassTabBar extends StatelessWidget {
+  const _LiquidGlassTabBar({
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  static const _items = [
+    _TabBarItem(Icons.home_rounded, 'Trang chủ'),
+    _TabBarItem(Icons.groups_rounded, 'Thành viên'),
+    _TabBarItem(Icons.notifications_active_rounded, 'Lịch nhắc'),
+    _TabBarItem(Icons.settings_rounded, 'Cài đặt'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      minimum: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(36),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Container(
+            height: 82,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.72),
+              borderRadius: BorderRadius.circular(36),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.82)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 34,
+                  offset: const Offset(0, 18),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                for (var index = 0; index < _items.length; index++)
+                  Expanded(
+                    child: _LiquidGlassTab(
+                      item: _items[index],
+                      selected: index == selectedIndex,
+                      onTap: () => onSelected(index),
+                    ),
+                  ),
+              ],
+            ),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: NavigationBar(
-              selectedIndex: controller.selectedIndex,
-              onDestinationSelected: controller.selectTab,
-              height: 64,
-              backgroundColor: Colors.transparent,
-              indicatorColor: Colors.transparent,
-              elevation: 0,
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined),
-                  selectedIcon: Icon(Icons.home_rounded),
-                  label: 'Trang chủ',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.favorite_border_rounded),
-                  selectedIcon: Icon(Icons.favorite_rounded),
-                  label: 'Hồ sơ',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.calendar_month_outlined),
-                  selectedIcon: Icon(Icons.calendar_month_rounded),
-                  label: 'Lịch',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.description_outlined),
-                  selectedIcon: Icon(Icons.description_rounded),
-                  label: 'Tài liệu',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.settings_outlined),
-                  selectedIcon: Icon(Icons.settings_rounded),
-                  label: 'Cài đặt',
+        ),
+      ),
+    );
+  }
+}
+
+class _LiquidGlassTab extends StatelessWidget {
+  const _LiquidGlassTab({
+    required this.item,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _TabBarItem item;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected ? AppColors.secondary : AppColors.text;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(30),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              color: selected
+                  ? const Color(0xFFE8EAF0).withValues(alpha: 0.86)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(
+                color: selected
+                    ? Colors.white.withValues(alpha: 0.72)
+                    : Colors.transparent,
+              ),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(item.icon, color: color, size: 28),
+                const SizedBox(height: 4),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    item.label,
+                    maxLines: 1,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: color,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -130,4 +218,11 @@ class _ShellScaffold extends StatelessWidget {
       ),
     );
   }
+}
+
+class _TabBarItem {
+  const _TabBarItem(this.icon, this.label);
+
+  final IconData icon;
+  final String label;
 }

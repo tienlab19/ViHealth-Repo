@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/services/local_notification_service.dart';
 import '../../domain/entities/family_dashboard.dart';
 import '../../domain/entities/family_member.dart';
 import '../../domain/entities/health_document.dart';
@@ -13,10 +14,12 @@ class FamilyDashboardController extends ChangeNotifier {
   FamilyDashboardController({
     required this.getFamilyDashboard,
     required this.repository,
+    this.notificationService,
   });
 
   final GetFamilyDashboard getFamilyDashboard;
   final FamilyHealthRepository repository;
+  final LocalNotificationService? notificationService;
 
   FamilyDashboard? dashboard;
   bool isLoading = true;
@@ -35,6 +38,7 @@ class FamilyDashboardController extends ChangeNotifier {
     }
     isLoading = false;
     notifyListeners();
+    await notificationService?.syncReminders(dashboard?.reminders ?? []);
   }
 
   void selectTab(int index) {
@@ -100,10 +104,16 @@ class FamilyDashboardController extends ChangeNotifier {
 
   Future<void> saveReminder(Reminder reminder) async {
     await repository.saveReminder(reminder);
+    if (reminder.isEnabled) {
+      await notificationService?.scheduleReminder(reminder);
+    } else {
+      await notificationService?.cancelReminder(reminder.id);
+    }
     await load();
   }
 
   Future<void> deleteReminder(String reminderId) async {
+    await notificationService?.cancelReminder(reminderId);
     await repository.deleteReminder(reminderId);
     await load();
   }
